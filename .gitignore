@@ -1,2 +1,3 @@
-config/
-__pycache__/
+/__pycache__
+config/db.py
+routes/__pycache__
