@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from schema import construction
 
-class Type_Construction(BaseModel):
+class TypeConstructionSchema(BaseModel):
     id:int
     name:str
     description:str | None

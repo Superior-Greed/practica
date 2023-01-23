@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel
 
-class User(BaseModel):
+class UserSchema(BaseModel):
     id: int
     user_name:str
     name:str
@@ -11,13 +11,19 @@ class User(BaseModel):
     image:str | None
     session_init:datetime | None
 
-class Role(BaseModel):
+class RoleSchema(BaseModel):
     id:int
     name:str
     description:str | None
 
-class UserRole(BaseModel):
+class UsersRolesSchema(BaseModel):
     id_user:int
-    users: list[User] = [] | None
+    users: list[UserSchema] = [] 
     id_role:int
-    roles: list[Role] = [] | None
+    roles: list[RoleSchema] = [] 
+
+class UserRolesSchema(BaseModel):
+    id_user:int
+    user: UserSchema
+    id_role:int
+    roles:list [RoleSchema] = [] 
