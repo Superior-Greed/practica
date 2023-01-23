@@ -2,14 +2,19 @@ from sqlalchemy import Table,Column, Integer,String,DateTime,Text
 from sqlalchemy.orm import relationship
 
 from config.db import Base
-class UserRoles(Base):
+
+association_user_roles = Table(
+    "userRoles",
+    Base.metadata,
+    Column("user_id",ForeignKey=("users.id"),primary_key=True),
+    Column("roles_id",ForeignKey=("roles.id"),primary_key=True)
+)
+
+class User_Roles(Base):
     __tablename__ = "userRoles"
 
-    user_id = Column(ForeignKey=("users.id"),primary_key=True)
+    user_id = Column(ForeignKey=("users.id"),primary_key=True),
     roles_id = Column(ForeignKey=("roles.id"),primary_key=True)
-
-    roles = relationship("Role", back_populates="users")
-    users = relationship("User", back_populates="roles")
 
 class User(Base):
     __tablename__ = "users"
@@ -23,7 +28,7 @@ class User(Base):
     image = Column(Text,nullable=True)
     session_init = Column(DateTime,nullable=True)
 
-    roles = relationship("UserRoles",back_populates="users")
+    roles = relationship("Role",secundary="userRoles",back_populates="users")
 
 class Role(Base):
     __tablename__ = "roles"
@@ -32,5 +37,5 @@ class Role(Base):
     name = Column(String(250),unique=True)
     description = Column(Text, nullable = True)
 
-    users = relationship("UserRoles", back_populates="roles")
+    users = relationship("User",secundary=association_user_roles,back_populates="roles")
 

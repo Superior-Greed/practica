@@ -3,19 +3,37 @@ from sqlalchemy.orm import relationship
 
 from config.db import Base
 
-association_construction_image = Table(
-    "constructionImages",
-    Base.metadata,
-    Column("construction_id",ForeignKey=("constructions.id"),primary_key=True),
-    Column("image_id",ForeignKey=("images.id"),primary_key=True)
-)
+# association_construction_image = Table(
+#     "constructionImages",
+#     Base.metadata,
+#     Column("construction_id",ForeignKey=("constructions.id"),primary_key=True),
+#     Column("image_id",ForeignKey=("images.id"),primary_key=True)
+# )
 
-association_construction_material = Table(
-    "constructionMaterials",
-    Base.metadata,
-    Column("construction_id",ForeignKey=("constructions.id"),primary_key=True),
-    Column("material_id",ForeignKey=("material.id"),primary_key=True)
-)
+# association_construction_material = Table(
+#     "constructionMaterials",
+#     Base.metadata,
+#     Column("construction_id",ForeignKey=("constructions.id"),primary_key=True),
+#     Column("material_id",ForeignKey=("material.id"),primary_key=True)
+# )
+
+class ConstructionImage(Base):
+    __tablename__ = "constructionImages"
+
+    costruction_id = Column(ForeignKey=("constructions.id"),primary_key=True)
+    image_id = Column(ForeignKey=("images.id"),primary_key=True)
+
+    constructions = relationship("Construction", back_populates="images")
+    images = relationship("ImageConstruction", back_populates="construction")
+
+class ConstructionMaterial(Base):
+    __tablename__ = "constructionMaterials"
+
+    costruction_id = Column(ForeignKey=("constructions.id"),primary_key=True)
+    material_id = Column(ForeignKey=("material.id"),primary_key=True)
+
+    constructions = relationship("Construction", back_populates="materials")
+    materials = relationship("Material", back_populates="construction")
 
 class Construction(Base):
     __tablename__ = "constructions"
@@ -27,12 +45,12 @@ class Construction(Base):
     final_date = Column(DateTime,nullable=True)
     id_type_construction = Column(Integer,ForeignKey("typeConstruction.id"))
 
-    type_construction = relationship("Type_Construction",back_populates="constructions")
-    images = relationship("Image_Construction",secundary=association_construction_image,back_populates="construction")
-    materials = relationship("Material",secundary=association_construction_material,back_populates="construction")
+    type_construction = relationship("TypeConstruction",back_populates="constructions")
+    images = relationship("ConstructionImage",back_populates="constructions")
+    materials = relationship("ConstructionMaterial",back_populates="constructions")
 
 
-class Type_Construction(Base):
+class TypeConstruction(Base):
     __tablename__ = "typeConstructions"
     
     id = Column(Integer,primary_key=True,index=True)
@@ -41,14 +59,14 @@ class Type_Construction(Base):
 
     constructions = relationship("Construction",back_populates="type_construction")
 
-class Image_Construction(Base):
+class ImageConstruction(Base):
     __tablename__= "images"
     
     id = Column(Integer,primary_key=True,index=True)
     description = Column(Text,nullable=True)
     image = Column(Text,nullable=False)
 
-    construction = relationship("Construction",secundary=association_construction_image,back_populates="images")
+    construction = relationship("ConstructionImage",back_populates="images")
 
 class Material(Base):
     __tablename__ = "materials"
@@ -60,4 +78,4 @@ class Material(Base):
     # sell_price = Column(Numeric(10,2),nullable = True)
     image = Column(Text,nullable = True)
 
-    construction = relationship("Image_Construction",secundary=association_construction_material,back_populates="materials")
+    construction = relationship("ConstructionMaterial",back_populates="materials")

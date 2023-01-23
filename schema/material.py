@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class Material(BaseModel):
+class MaterialSchema(BaseModel):
     id: int
     name: str
     description: str | None
