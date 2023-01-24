@@ -1,12 +1,12 @@
-from sqlalchemy import Table,Column, Integer,String,DateTime,Text
+from sqlalchemy import Table,Column, Integer,String,DateTime,Text,ForeignKey
 from sqlalchemy.orm import relationship
 
 from config.db import Base
 class UserRoles(Base):
     __tablename__ = "userRoles"
-
-    user_id = Column(ForeignKey=("users.id"),primary_key=True)
-    roles_id = Column(ForeignKey=("roles.id"),primary_key=True)
+    
+    user_id = Column(Integer,ForeignKey("users.id"),ondelete="CASCADE",primary_key=True)
+    roles_id = Column(Integer,ForeignKey("roles.id"),primary_key=True)
 
     roles = relationship("Role", back_populates="users")
     users = relationship("User", back_populates="roles")

@@ -10,7 +10,7 @@ from service.jwt import JwtService
 T = TypeVar('T')
 
 
-class User_Service(BaseService):
+class UserService(BaseService):
     
     @staticmethod
     def search_username(db:Session, model:Generic[T],name:str):
@@ -33,23 +33,23 @@ class User_Service(BaseService):
 
     @staticmethod
     def exist_user(db:Session, model:User,name:str,email:str):
-        return db.query(model).filter(model.name == name or model.email == email).count() > 0
+        return db.query(model).filter(model.name == name | model.email == email).count() > 0
     
     def insert_user(user:UserSchema):
         new_user = User()
         new_user.user_name = user.user_name
-        new_user.name = user.name
-        new_user.last_name = user.last_name
+        new_user.name = user.name.title()
+        new_user.last_name = user.last_name.title()
         new_user.email = user.email
         new_user.password = user.password
         new_user.image = user.image
         return new_user
     
     def validate_user(self,user:User):
-        if(user.email == None):
+        if(user.email.replace("  ","")):
             return JsonRequest("no tiene email",None)
         
-        if(user.user_name == None):
+        if not user.user_name.replace("  ",""):
             return JsonRequest("no tiene el nombre de usuari", None)
         
         if not user.password.replace("  ",""):
@@ -95,8 +95,11 @@ class User_Service(BaseService):
     def delete_user(self,db:Session,id:int):
         user = self.exist_user(db,User,id)
         if(user != True):
+            user_roles = db.query(UserRoles).filter(UserRoles.user_id == id)
+            if user_roles.count()>0:
+                user_roles.delete()
             self.remove(db,user)
-            return JsonRequest("",True)
+            return JsonRequest("borrado con exito",True)
         return JsonRequest("el usuario no existe",None)
     
     def update_user(self,db:Session,user:User,id:int):
@@ -106,7 +109,7 @@ class User_Service(BaseService):
         
         if(self.exist_userid(db,user,id) ):
             self.update(db,user,id)
-            return JsonRequest("",user)
+            return JsonRequest("actualizado con exito",user)
         return JsonRequest("El usuario a modificar no existe",None)
     
     def add_role_user(self,db:Session,user_id:int,role_id:int):
