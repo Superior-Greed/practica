@@ -1,12 +1,9 @@
-from typing import TypeVar, Generic
 from sqlalchemy.orm import Session
 from generic_crud import BaseService
 from models.user import Role, UserRoles,User
 from schema.user import RoleSchema
 from schema.generic import JsonRequest
 
-
-T = TypeVar('T')
 
 class RoleService(BaseService):
     
@@ -58,5 +55,8 @@ class RoleService(BaseService):
         not_exist = self.validate_user_role_exist(db,role_id,user_id)
         if not_exist.value:
             return not_exist
-        
-        return
+        user_role = db.query(UserRoles).filter(UserRoles.user_id == user_id & UserRoles.roles_id == role_id)
+        if user_role.count() > 0:
+            self.remove(user_role.first())
+            return JsonRequest("removido con exito",True)
+        return JsonRequest("no existe el usuario con ese rol",False)

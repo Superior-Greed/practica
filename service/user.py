@@ -117,3 +117,19 @@ class UserService(BaseService):
         user_role.user_id = user_id
         user_role.roles_id = role_id
         return self.add(user_role)
+    
+    def logi(self,db:Session,user:User):
+        _user = self.search_username(db,user,user.user_name)
+        if _user == None:
+            return JsonRequest("no existe el usario",None)
+        if JwtService.verify_password(user.password,_user.password) and user.email == user.email:
+            _userschema =  UserSchema(
+                id= _user.id,
+                email= _user.email,
+                user_name = _user.user_name,
+                name= _user.name,
+                last_name= _user.last_name,
+                image= _user.image
+            )
+            return JsonRequest("",_userschema,JwtService.generate_toke(_userschema))
+        return JsonRequest("contrasena o correo incorrecto",None)
