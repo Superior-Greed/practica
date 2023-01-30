@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from generic_crud import BaseService
+from service.generic_crud import BaseService
 from models.user import Role, UserRoles,User
 from schema.user import RoleSchema
 from schema.generic import JsonRequest

@@ -6,12 +6,14 @@ from schema.user import UserSchema
 from schema.generic import JsonRequest
 from datetime import datetime
 from service.jwt import JwtService
+from sqlalchemy import or_,and_
 
 T = TypeVar('T')
 
 
 class UserService(BaseService):
-    
+    jwt = JwtService()
+
     @staticmethod
     def search_username(db:Session, model:Generic[T],name:str):
         return db.query(model).filter(model.user_name == name).first()
@@ -32,9 +34,10 @@ class UserService(BaseService):
         return db.query(model).filter(model.id == id).count() > 0
 
     @staticmethod
-    def exist_user(db:Session, model:User,name:str,email:str):
-        return db.query(model).filter(model.name == name | model.email == email).count() > 0
+    def exist_user_email_name(db:Session, model:User,user_name:str,email:str):
+        return db.query(model).filter(or_(model.user_name == user_name, model.email == email)).count() > 0
     
+    @staticmethod
     def insert_user(user:UserSchema):
         new_user = User()
         new_user.user_name = user.user_name
@@ -43,101 +46,93 @@ class UserService(BaseService):
         new_user.email = user.email
         new_user.password = user.password
         new_user.image = user.image
+        new_user.session_init = datetime.utcnow
         return new_user
     
-    def validate_user(self,user:User):
-        if(user.email.replace("  ","")):
-            return JsonRequest("no tiene email",None)
+    @staticmethod
+    def insert_user_schema(user:User):
+        new_user = UserSchema(
+        id = user.id,
+        user_name = user.user_name,
+        name = user.name.title(),
+        last_name = user.last_name.title(),
+        email = user.email,
+        password = user.password,
+        image = user.image)
+        return new_user
+    
+    @staticmethod
+    def validate_user(user:User):
+        if(not user.email.replace("  ","")):
+            return JsonRequest( error="no tiene email",value=None)
         
         if not user.user_name.replace("  ",""):
-            return JsonRequest("no tiene el nombre de usuari", None)
+            return JsonRequest(error="no tiene el nombre de usuari", value=None)
         
         if not user.password.replace("  ",""):
-            return JsonRequest("no hay contrasena", None)
+            return JsonRequest(error="no hay contrasena", value=None)
         
-        return True
-    
-    # def insert_user(self,db:Session,user:User):
-    #     validation = self.validate_user(db,user)
-    #     if validation.value == None:
-    #         return validation
-        
-    #     _user_name = self.exist_user(db,user,user.name,user.email)
-    #     if(_user_name == False):
-    #         user.password = JwtService.password_hash(user.password)
-    #         user.session_init = datetime.utcnow()
-    #         new_user = self.add(db,user)
-    #         return JsonRequest("",new_user)
-        
-    #     return JsonRequest("el usario ya existe",None)
+        return JsonRequest(error="todo bien",value=True)
     
     #si es true genera registro y token si no solo agrega usuario
-    def register_user_token_or_insert_user(self,db:Session,user:User,option:bool):
-        validation = self.validate_user(db,user)
+    def register_user_token_or_insert_user(self,db:Session,user:User,option:bool = False):
+        validation = self.validate_user(user)
         if validation.value == None:
             return validation
-        
-        _user_name = self.exist_user(db,user,user.name,user.email)
+
+        _user_name = self.exist_user_email_name(db,User,user.user_name,user.email)
         if(_user_name == False):
-            user.password = JwtService.password_hash(user.password)
+
+            user.password = self.jwt.password_hash(user.password)
             user.session_init = datetime.utcnow()
             new_user = self.add(db,user)
             if option:
-                _userschema =  UserSchema(
-                    id= new_user.id,
-                    email= new_user.email,
-                    user_name = new_user.user_name,
-                    name= new_user.name,
-                    last_name= new_user.last_name,
-                    image= new_user.image
-                )
+                _userschema = self.insert_user_schema(user)
                 token = JwtService.generate_toke(_userschema)
                 if token == None:
-                    return JsonRequest("usuario creado, problema con creacion de token",new_user)
-                return JsonRequest("",new_user,token)
-            return JsonRequest("",new_user)
+                    return JsonRequest(error="usuario creado, problema con creacion de token",value=new_user)
+                return JsonRequest(error="",value=new_user,token=token)
+            return JsonRequest(error="",value=new_user)
         
-        return JsonRequest("el usario ya existe",None)
+        return JsonRequest(error="el usario ya existe",value=None)
 
 
     def delete_user(self,db:Session,id:int):
         user = self.exist_user(db,User,id)
-        if(user != True):
+        if(user != False):
             user_roles = db.query(UserRoles).filter(UserRoles.user_id == id)
             if user_roles.count()>0:
                 user_roles.delete()
             self.remove(db,user)
-            return JsonRequest("borrado con exito",True)
-        return JsonRequest("el usuario no existe",None)
+            return JsonRequest(error="borrado con exito",value=True)
+        return JsonRequest(error="el usuario no existe",value=None)
     
     def update_user(self,db:Session,user:User,id:int):
-        validation = self.validate_user(db,user)
+        validation = self.validate_user(user)
         if validation.value == None:
             return validation
         
-        if(self.exist_userid(db,user,id) ):
-            self.update(db,user,id)
-            return JsonRequest("actualizado con exito",user)
-        return JsonRequest("El usuario a modificar no existe",None)
+        if(self.exist_userid(db,User,id) ):
+            user.password = self.jwt.password_hash (user.password)
+            user.id = id
+            db.query(User).filter(User.id == id).update({User.name : user.name , 
+                                                        User.last_name : user.last_name, 
+                                                        User.password : user.password,
+                                                        User.image : user.image},synchronize_session=False)
+            return JsonRequest(error="actualizado con exito",value=self.insert_user_schema(user))
+        return JsonRequest(error="El usuario a modificar no existe",value=None)
     
     def add_role_user(self,db:Session,user_id:int,role_id:int):
         user_role = UserRoles()
         user_role.user_id = user_id
         user_role.roles_id = role_id
-        return JsonRequest("agregado con exito", self.add(user_role))
+        return JsonRequest(error="agregado con exito", value=self.add(user_role))
     
     def login(self,db:Session,user:User):
-        _user = self.search_username(db,user,user.user_name)
+        _user = self.search_username(db,User,user.user_name)
+        _userschema = self.insert_user_schema(_user)
         if _user == None:
-            return JsonRequest("no existe el usario",None)
-        if JwtService.verify_password(user.password,_user.password) and user.email == user.email:
-            _userschema =  UserSchema(
-                id= _user.id,
-                email= _user.email,
-                user_name = _user.user_name,
-                name= _user.name,
-                last_name= _user.last_name,
-                image= _user.image
-            )
-            return JsonRequest("",_userschema,JwtService.generate_toke(_userschema))
-        return JsonRequest("contrasena o correo incorrecto",None)
+            return JsonRequest(error="no existe el usario",value=None)
+        if self.jwt.verify_password(user.password,_user.password) and _user.email == user.email.replace("  ",""):
+            return JsonRequest(error="",value=_userschema,token=JwtService.generate_toke(_userschema))
+        return JsonRequest(error="contrasena o correo incorrecto",value=None)

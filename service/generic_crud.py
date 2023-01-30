@@ -32,9 +32,14 @@ class BaseService():
         db.refresh(models)
         return models
     
-    @staticmethod
-    def update(db:Session, model:Generic[T],id:int):
-        db.query(model).filter(model.id == id).first().update(model,synchronize_session=False)
+    # @staticmethod
+    # def update(db: Session, model: Generic[T],id:int):
+    #     db.commit()
+    #     db.refresh(model)
+
+    # @staticmethod
+    # def update(db:Session, model:Generic[T],id:int):
+    #     db.query(model).filter(model.id == id).first().update(model,synchronize_session=False)
 
     # @staticmethod
     # def update(db:Session,model:Generic[T],id: int):

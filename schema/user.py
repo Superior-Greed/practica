@@ -9,7 +9,7 @@ class UserSchema(BaseModel):
     email: str
     password:str
     image:str | None
-    session_init:datetime | None
+    #session_init:datetime | None
 
 class RoleSchema(BaseModel):
     id:int

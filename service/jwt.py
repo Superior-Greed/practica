@@ -25,14 +25,14 @@ class JwtService():
         if data != None:
             encode = {
                 "sub": data.user_name,
-                "exp": datetime.utcnow + expire,
-                "iat": datetime.utcnow
+                "exp": datetime.utcnow() + timedelta(minutes=expire),
+                "iat": datetime.utcnow()
             }
             encode_jwt = jwt.encode(encode,SECRET_KEY,algorithm=ALGORITHM)
             return encode_jwt
         return None
     
-    def decode_token(token:str):
+    def decode_token(self,token:str):
         try:
             decode_token = jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
             return decode_token 
