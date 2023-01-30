@@ -20,7 +20,7 @@ class TypeConstructioService(BaseService):
     
     def delete_type_costruction(self,db:Session,id:int):
         type_costruction = db.query(TypeConstruction).filter(TypeConstruction.id == id)
-        if type_costruction.count()>0:
+        if type_costruction.count()==0:
             return JsonRequest("no esta registrado se tipo de construccion",None)
         type_costruction.delete()
         return JsonRequest("se a eliminado con exito",True)

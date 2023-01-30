@@ -30,7 +30,7 @@ class ConstructionMaterial(Base):
     __tablename__ = "constructionMaterials"
 
     costruction_id = Column(Integer,ForeignKey("constructions.id"),primary_key=True)
-    material_id = Column(Integer,ForeignKey("material.id"),primary_key=True)
+    material_id = Column(Integer,ForeignKey("materials.id"),primary_key=True)
 
     constructions = relationship("Construction", back_populates="materials")
     materials = relationship("Material", back_populates="construction")
@@ -43,7 +43,7 @@ class Construction(Base):
     price= Column(Numeric(10,2),nullable=True)
     init_date = Column(DateTime,nullable=True)
     final_date = Column(DateTime,nullable=True)
-    id_type_construction = Column(Integer,ForeignKey("typeConstruction.id"))
+    id_type_construction = Column(Integer,ForeignKey("typeConstructions.id"))
 
     type_construction = relationship("TypeConstruction",back_populates="constructions")
     # images = relationship("ConstructionImage",back_populates="constructions")

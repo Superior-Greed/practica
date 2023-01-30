@@ -3,6 +3,7 @@ from fastapi import APIRouter,Depends
 from typing import Union
 from pydantic import BaseModel
 from fastapi import FastAPI
+from routes import users
 from middleware.jwt_http import JwtMiddleware 
 
 
@@ -27,16 +28,16 @@ from middleware.jwt_http import JwtMiddleware
 #     price:float
 #     is_offer: Union[bool,None]=None
 
-user = APIRouter()
+router = APIRouter()
+router.include_router(users.user_route)
+# @router.get("/home", dependencies=[Depends(JwtMiddleware())])
+# async def read_root():
+#     return {"hello":"world"}
 
-@user.get("/home", dependencies=[Depends(JwtMiddleware())])
-async def read_root():
-    return {"hello":"world"}
 
-
-@user.get("/items/{id}")
-async def read_item(id:int, q: Union[str,None] =None):
-    return {"id":id,"q":q}
+# @router.get("/items/{id}")
+# async def read_item(id:int, q: Union[str,None] =None):
+#     return {"id":id,"q":q}
 
 # @app.put("/item/{id}")
 # async def update_item(id:int,item:Item):

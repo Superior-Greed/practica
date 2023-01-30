@@ -49,7 +49,7 @@ class RoleService(BaseService):
         user_role = UserRoles()
         user_role.user_id = user_id
         user_role.roles_id = role_id
-        return self.add(db,user_role)
+        return JsonRequest("agregado con exito",  self.add(db,user_role))
     
     def remove_role_user(self,db:Session,role_id:int,user_id:int):
         not_exist = self.validate_user_role_exist(db,role_id,user_id)

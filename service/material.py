@@ -1,7 +1,7 @@
 from typing import TypeVar, Generic
 from sqlalchemy.orm import Session
 from generic_crud import BaseService
-from models.fences import Material
+from models.fences import Material,ConstructionMaterial
 from schema.material import MaterialSchema
 from schema.generic import JsonRequest
 from datetime import datetime
@@ -23,8 +23,11 @@ class MaterialService(BaseService):
     
     def remove_material(self,db:Session,id:int):
         material = db.query(Material).filter(Material.id == id)
-        if material.count()>0:
+        if material.count()==0:
             return JsonRequest("no existe el material a eliminar",None)
+        construction_material = db.query(ConstructionMaterial).filter(ConstructionMaterial.material_id == id)
+        if construction_material > 0:
+            construction_material.delete()
         material.delete()
         return JsonRequest("material eliminado",True)
     

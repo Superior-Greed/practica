@@ -1,6 +1,6 @@
 from typing import TypeVar, Generic
 from sqlalchemy.orm import Session
-from generic_crud import BaseService
+from service.generic_crud import BaseService
 from models.user import User,UserRoles
 from schema.user import UserSchema
 from schema.generic import JsonRequest
@@ -83,7 +83,15 @@ class UserService(BaseService):
             user.session_init = datetime.utcnow()
             new_user = self.add(db,user)
             if option:
-                token = JwtService.generate_toke(user)
+                _userschema =  UserSchema(
+                    id= new_user.id,
+                    email= new_user.email,
+                    user_name = new_user.user_name,
+                    name= new_user.name,
+                    last_name= new_user.last_name,
+                    image= new_user.image
+                )
+                token = JwtService.generate_toke(_userschema)
                 if token == None:
                     return JsonRequest("usuario creado, problema con creacion de token",new_user)
                 return JsonRequest("",new_user,token)
@@ -116,9 +124,9 @@ class UserService(BaseService):
         user_role = UserRoles()
         user_role.user_id = user_id
         user_role.roles_id = role_id
-        return self.add(user_role)
+        return JsonRequest("agregado con exito", self.add(user_role))
     
-    def logi(self,db:Session,user:User):
+    def login(self,db:Session,user:User):
         _user = self.search_username(db,user,user.user_name)
         if _user == None:
             return JsonRequest("no existe el usario",None)
