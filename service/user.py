@@ -103,6 +103,7 @@ class UserService(BaseService):
             user_roles = db.query(UserRoles).filter(UserRoles.user_id == id)
             if user_roles.count()>0:
                 user_roles.delete()
+                db.commit()
             self.remove(db,user)
             return JsonRequest(error="borrado con exito",value=True)
         return JsonRequest(error="el usuario no existe",value=None)
@@ -119,14 +120,9 @@ class UserService(BaseService):
                                                         User.last_name : user.last_name, 
                                                         User.password : user.password,
                                                         User.image : user.image},synchronize_session=False)
+            db.commit()
             return JsonRequest(error="actualizado con exito",value=self.insert_user_schema(user))
         return JsonRequest(error="El usuario a modificar no existe",value=None)
-    
-    def add_role_user(self,db:Session,user_id:int,role_id:int):
-        user_role = UserRoles()
-        user_role.user_id = user_id
-        user_role.roles_id = role_id
-        return JsonRequest(error="agregado con exito", value=self.add(user_role))
     
     def login(self,db:Session,user:User):
         _user = self.search_username(db,User,user.user_name)

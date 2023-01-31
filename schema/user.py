@@ -21,9 +21,12 @@ class UsersRolesSchema(BaseModel):
     users: list[UserSchema] = [] 
     id_role:int
     roles: list[RoleSchema] = [] 
-
 class UserRolesSchema(BaseModel):
     id_user:int
     user: UserSchema
     id_role:int
     roles:list [RoleSchema] = [] 
+
+class UserRoleSchema(BaseModel):
+    user_id:int
+    role_id:int

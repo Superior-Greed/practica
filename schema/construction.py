@@ -1,7 +1,9 @@
 from pydantic import BaseModel
 from datetime import datetime
 from schema import type_construction,image,material
+from typing import Generic,TypeVar
 
+T = TypeVar('T')
 class ConstructionSchema(BaseModel):
     id : int
     name: str

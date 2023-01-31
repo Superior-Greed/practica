@@ -7,4 +7,4 @@ fences.Base.metadata.create_all(bind=engine)
 user.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-app.include_router(router,prefix="/users")
+app.include_router(router)
