@@ -9,6 +9,7 @@ from datetime import datetime
 
 class MaterialService(BaseService):
 
+    @staticmethod
     def insert_materials(material:MaterialSchema):
         new_material = Material()
         new_material.image = material.image
@@ -16,6 +17,7 @@ class MaterialService(BaseService):
         new_material.description = material.description
         return new_material
     
+    @staticmethod
     def insert_materials_schema(material:Material):
         new_material = MaterialSchema(
         id=material.id,
@@ -26,7 +28,7 @@ class MaterialService(BaseService):
         return new_material
     
     def add_material(self,db:Session,material:Material):
-        if not material.name.replace("  ",""):
+        if not material.name.replace(" ",""):
             return JsonRequest(error="no tiene nombre el material",value=None)
         return  JsonRequest(error="actualizado con exito",value=self.insert_materials_schema(self.add(db,material)))
     
@@ -35,7 +37,7 @@ class MaterialService(BaseService):
         if material.count()==0:
             return JsonRequest(error="no existe el material a eliminar",value=None)
         construction_material = db.query(ConstructionMaterial).filter(ConstructionMaterial.material_id == id)
-        if construction_material > 0:
+        if construction_material.count() > 0:
             construction_material.delete()
             db.commit()
         material.delete()
@@ -44,7 +46,7 @@ class MaterialService(BaseService):
     
     def update_material(self,db:Session,material:Material,id:int):
         exist = db.query(Material).filter(Material.id == id).count()
-        if(exist):
+        if(exist>0):
             db.query(Material).filter(Material.id == id).update({
                 Material.image: material.image,
                 Material.description: material.description,

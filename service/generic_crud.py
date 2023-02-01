@@ -29,7 +29,7 @@ class BaseService():
     def add_all(db:Session,models:list[Generic[T]]):
         db.add_all(models)
         db.commit()
-        db.refresh(models)
+        db.flush()
         return models
     
     # @staticmethod

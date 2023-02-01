@@ -24,7 +24,7 @@ class TypeConstructioService(BaseService):
         return new_type_construction
     
     def add_type_construction(self,db:Session,type_construction:TypeConstruction):
-        if not type_construction.name.replace("  ",""):
+        if not type_construction.name.replace(" ",""):
             return JsonRequest(error="no hay nombre",value=None)
         return JsonRequest(error="creado con exito",value=self.insert_type_costruction_schema(self.add(db,type_construction)))
     

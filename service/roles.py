@@ -38,7 +38,7 @@ class RoleService(BaseService):
       return False
 
     def add_role(self,db:Session,role:Role):
-        if not role.name.replace("  ",""):
+        if not role.name.replace(" ",""):
             JsonRequest(error="no hay nombre",value=None)
         if self.exist_role_name(db,Role,role.name):
             return JsonRequest(error="ya existe",value=None)

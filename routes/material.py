@@ -14,21 +14,21 @@ _material_service = material_service.MaterialService()
 auth_handler = jwt.JwtService()
 
 @material_route.get("/",dependencies=[Depends(auth_handler.auth_token)])
-async def role_all(db:Session = Depends(get_db)):
+async def material_all(db:Session = Depends(get_db)):
     return _material_service.all(db,material_model.Material)
 
 @material_route.get("/{id}",dependencies=[Depends(auth_handler.auth_token)])
-async def role_filter(id:int,db:Session = Depends(get_db)):
+async def material_filter(id:int,db:Session = Depends(get_db)):
     return _material_service.filter(db,material_model.Material,id)
 
 @material_route.post("/",dependencies=[Depends(auth_handler.auth_token)])
-async def role_create(type_constructio:material_schema.MaterialSchema,db:Session = Depends(get_db)):
-    return _material_service.add_material(db,_material_service.insert_type_costruction(type_constructio))
+async def material_create(material:material_schema.MaterialSchema,db:Session = Depends(get_db)):
+    return _material_service.add_material(db,_material_service.insert_materials(material))
 
-@material_route.delete("/{id}")
-async def role_delete(id:int,db:Session = Depends(get_db)):
+@material_route.delete("/{id}",dependencies=[Depends(auth_handler.auth_token)])
+async def material_delete(id:int,db:Session = Depends(get_db)):
     return _material_service.remove_material(db,id)
 
 @material_route.put("/{id}",dependencies=[Depends(auth_handler.auth_token)])
-async def role_update(id:int,type_constructio:material_schema.MaterialSchema,db:Session = Depends(get_db)):
-    return _material_service.update_material(db,type_constructio,id)
+async def material_update(id:int,material:material_schema.MaterialSchema,db:Session = Depends(get_db)):
+    return _material_service.update_material(db,material,id)

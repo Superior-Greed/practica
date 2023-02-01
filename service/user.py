@@ -63,13 +63,13 @@ class UserService(BaseService):
     
     @staticmethod
     def validate_user(user:User):
-        if(not user.email.replace("  ","")):
+        if(not user.email.replace(" ","")):
             return JsonRequest( error="no tiene email",value=None)
         
-        if not user.user_name.replace("  ",""):
+        if not user.user_name.replace(" ",""):
             return JsonRequest(error="no tiene el nombre de usuari", value=None)
         
-        if not user.password.replace("  ",""):
+        if not user.password.replace(" ",""):
             return JsonRequest(error="no hay contrasena", value=None)
         
         return JsonRequest(error="todo bien",value=True)
@@ -86,7 +86,7 @@ class UserService(BaseService):
             user.password = self.jwt.password_hash(user.password)
             user.session_init = datetime.utcnow()
             new_user = self.add(db,user)
-            if option:
+            if option == True:
                 _userschema = self.insert_user_schema(user)
                 token = JwtService.generate_toke(_userschema)
                 if token == None:
@@ -129,6 +129,6 @@ class UserService(BaseService):
         _userschema = self.insert_user_schema(_user)
         if _user == None:
             return JsonRequest(error="no existe el usario",value=None)
-        if self.jwt.verify_password(user.password,_user.password) and _user.email == user.email.replace("  ",""):
+        if self.jwt.verify_password(user.password,_user.password) and _user.email == user.email.replace(" ",""):
             return JsonRequest(error="",value=_userschema,token=JwtService.generate_toke(_userschema))
         return JsonRequest(error="contrasena o correo incorrecto",value=None)
