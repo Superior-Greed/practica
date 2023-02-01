@@ -3,6 +3,7 @@ from service.generic_crud import BaseService
 from models.fences import Construction,ConstructionMaterial,TypeConstruction,ImageConstruction,Material
 from schema.construction import ConstructionSchema
 from schema.generic import JsonRequest
+from sqlalchemy import or_,and_
 
 class ConstructionService(BaseService):
     
@@ -32,7 +33,7 @@ class ConstructionService(BaseService):
             construction_material = db.query(ConstructionMaterial).filter(ConstructionMaterial.costruction_id == id)
             if construction_material.count() > 0:
                 construction_material.delete()
-                db.commit()
+            db.query(ImageConstruction).filter(ImageConstruction.id_construction == id).delete()
             exist_construction.delete()
             db.commit()
             return JsonRequest(error="construccion eliminada con exito",value=True)
@@ -57,7 +58,7 @@ class ConstructionService(BaseService):
         return JsonRequest(error="no existe la construccion",value=None)
 
     def add_construction_material(self,db:Session,construction_id:int,material_id:int):
-        exist_construction = db.query(ConstructionMaterial).filter(ConstructionMaterial.costruction_id == construction_id & ConstructionMaterial.material_id == material_id).count()>0
+        exist_construction = db.query(ConstructionMaterial).filter(and_(ConstructionMaterial.costruction_id == construction_id , ConstructionMaterial.material_id == material_id)).count()>0
         if exist_construction:
             JsonRequest(error="ya existe",value=True)
         construction_material = ConstructionMaterial()
@@ -66,7 +67,7 @@ class ConstructionService(BaseService):
         return JsonRequest(error="agregado con exito", value= self.add(db,construction_material))
     
     def delete_construction_material(self,db:Session,construction_id:int,material_id:int):
-        construction_material = db.query(ConstructionMaterial).filter(ConstructionMaterial.material_id == material_id & ConstructionMaterial.costruction_id == construction_id)
+        construction_material = db.query(ConstructionMaterial).filter(and_(ConstructionMaterial.material_id == material_id , ConstructionMaterial.costruction_id == construction_id))
         if  construction_material.count()> 0:
             construction_material.delete()
             db.commit()
@@ -78,3 +79,6 @@ class ConstructionService(BaseService):
     
     def filter_construction(self,db:Session,id:int):
         return db.query(Construction,TypeConstruction,ImageConstruction,Material).join(Construction.materials).join(Construction.type_construction).join(Construction.images).filter(Construction.id == id).first()
+    
+    def filter_construction_material(self,db:Session,id:int):
+        return db.query(ConstructionMaterial).filter(ConstructionMaterial.costruction_id == id).all()

@@ -32,11 +32,19 @@ async def construction_delete(id:int,db:Session = Depends(get_db)):
 @construction_route.put("/{id}",dependencies=[Depends(auth_handler.auth_token)])
 async def construction_update(id:int,construction:construction_schema.ConstructionSchema,db:Session = Depends(get_db)):
     return _construction_service.update_construction(db,_construction_service.insert_construction(construction),id)
+    
+@construction_route.get("/construction_material/",dependencies=[Depends(auth_handler.auth_token)])
+async def construction_material_create(db:Session = Depends(get_db)):
+    return _construction_service.all(db,construction_model.ConstructionMaterial)
 
-@construction_route.delete("/construction_material/{construction_id}/{material_id}")
-async def construction_material_delete(construction_id:int,material_id:int,db:Session = Depends(get_db)):
-    return _construction_service.delete_construction_material(db,construction_id,material_id)
+@construction_route.get("/construction_material/{id}",dependencies=[Depends(auth_handler.auth_token)])
+async def construction_material_create(id:int,db:Session = Depends(get_db)):
+    return _construction_service.filter_construction_material(db,id)
 
-@construction_route.post("/construction_material/")
+@construction_route.post("/construction_material/",dependencies=[Depends(auth_handler.auth_token)])
 async def construction_material_create(construction_id:int,material_id:int,db:Session = Depends(get_db)):
     return _construction_service.add_construction_material(db,construction_id,material_id)
+
+@construction_route.delete("/construction_material/{construction_id}/{material_id}",dependencies=[Depends(auth_handler.auth_token)])
+async def construction_material_delete(construction_id:int,material_id:int,db:Session = Depends(get_db)):
+    return _construction_service.delete_construction_material(db,construction_id,material_id)

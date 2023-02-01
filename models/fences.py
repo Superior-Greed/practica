@@ -68,7 +68,8 @@ class ImageConstruction(Base):
     id = Column(Integer,primary_key=True,index=True)
     description = Column(Text,nullable=True)
     image = Column(Text,nullable=False)
-    id_construction = Column(Integer,ForeignKey("constructions.id"))
+    id_construction = Column(Integer,ForeignKey("constructions.id", ondelete='CASCADE'))
+    
     construction = relationship("Construction",back_populates="images")
     # construction = relationship("ConstructionImage",back_populates="images")
 
