@@ -36,11 +36,11 @@ async def user_delete(id:int,db:Session = Depends(get_db),user_name = Depends(au
     return _user_service.delete_user(db,id)
 
 @user_route.get("/",dependencies=[Depends(auth_handler.auth_token)])
-async def user_all(db:Session = Depends(get_db),user_name = Depends(auth_handler.auth_token)):
+async def user_all(db:Session = Depends(get_db)):
     return _user_service.all(db,user_model.User)
 
 @user_route.get("/{id}",dependencies=[Depends(auth_handler.auth_token)])
-async def user_filter(id:int,db:Session = Depends(get_db),user_name = Depends(auth_handler.auth_token)):
+async def user_filter(id:int,db:Session = Depends(get_db)):
     return _user_service.filter(db,user_model.User,id)
 
 @user_route.get("/users_role/{id_user}",dependencies=[Depends(auth_handler.auth_token)])

@@ -54,8 +54,8 @@ class UserService(BaseService):
         new_user = UserSchema(
         id = user.id,
         user_name = user.user_name,
-        name = user.name.title(),
-        last_name = user.last_name.title(),
+        name = user.name,
+        last_name = user.last_name,
         email = user.email,
         password = user.password,
         image = user.image)
