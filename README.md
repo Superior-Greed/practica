@@ -13,3 +13,5 @@
 - agregar mas validaciones
 - reducir codigo y optimizarlas
 - agregar test mas coblejos y de todos los modelos
+
+**el fronent lo are en un proyecto aparte**
