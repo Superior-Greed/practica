@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from urllib.parse import quote_plus
 
-SQL_URL = "mysql://root:%s@localhost:3306/practica"% quote_plus("Dragon12@")
+SQL_URL = "mysql://root:%s@localhost:3306/practica"% quote_plus("pass@word")
 engine = create_engine(SQL_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
