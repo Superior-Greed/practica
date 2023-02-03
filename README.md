@@ -12,6 +12,6 @@
 - agregar otro modelo para dar acceso por rol a ciertas rutas mediante un middleware
 - agregar mas validaciones
 - reducir codigo y optimizarlas
-- agregar test mas coblejos y de todos los modelos
+- agregar test mas complejos y de todos los modelos
 
 **el fronent lo are en un proyecto aparte**
