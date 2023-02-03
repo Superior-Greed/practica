@@ -5,3 +5,5 @@ service/__pycache__
 middleware/__pycache__
 schema/__pycache__
 test/__pycache__
+models/__pycache__
+tests/__pycache__
