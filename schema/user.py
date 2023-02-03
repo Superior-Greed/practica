@@ -21,6 +21,7 @@ class UsersRolesSchema(BaseModel):
     users: list[UserSchema] = [] 
     id_role:int
     roles: list[RoleSchema] = [] 
+    
 class UserRolesSchema(BaseModel):
     id_user:int
     user: UserSchema
