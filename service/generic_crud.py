@@ -29,10 +29,17 @@ class BaseService():
     def add_all(db:Session,models:list[Generic[T]]):
         db.add_all(models)
         db.commit()
+        db.flush()
+        return models
     
-    @staticmethod
-    def update(db:Session, model:Generic[T],id:int):
-        db.query(model).filter(model.id == id).first().update(model,synchronize_session=False)
+    # @staticmethod
+    # def update(db: Session, model: Generic[T],id:int):
+    #     db.commit()
+    #     db.refresh(model)
+
+    # @staticmethod
+    # def update(db:Session, model:Generic[T],id:int):
+    #     db.query(model).filter(model.id == id).first().update(model,synchronize_session=False)
 
     # @staticmethod
     # def update(db:Session,model:Generic[T],id: int):

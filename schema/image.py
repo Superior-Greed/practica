@@ -4,3 +4,4 @@ class ImageConstructionSchema(BaseModel):
     id: int
     description:str
     image:str | None
+    id_construction: int

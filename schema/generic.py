@@ -3,7 +3,7 @@ from typing import Generic,TypeVar
 
 T = TypeVar('T')
 
-class JsonRequest(BaseModel):
+class JsonRequest(BaseModel,Generic[T]):
     error : str
-    value : Generic[T]
+    value : T
     token : str | None

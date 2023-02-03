@@ -17,20 +17,20 @@ from config.db import Base
 #     Column("material_id",ForeignKey=("material.id"),primary_key=True)
 # )
 
-class ConstructionImage(Base):
-    __tablename__ = "constructionImages"
+# class ConstructionImage(Base):
+#     __tablename__ = "constructionImages"
 
-    costruction_id = Column(ForeignKey=("constructions.id"),primary_key=True)
-    image_id = Column(ForeignKey=("images.id"),primary_key=True)
+#     costruction_id = Column(Integer,ForeignKey("constructions.id"),primary_key=True)
+#     image_id = Column(Integer,ForeignKey("images.id"),primary_key=True)
 
-    constructions = relationship("Construction", back_populates="images")
-    images = relationship("ImageConstruction", back_populates="construction")
+#     constructions = relationship("Construction", back_populates="images")
+#     images = relationship("ImageConstruction", back_populates="construction")
 
 class ConstructionMaterial(Base):
     __tablename__ = "constructionMaterials"
 
-    costruction_id = Column(ForeignKey=("constructions.id"),primary_key=True)
-    material_id = Column(ForeignKey=("material.id"),primary_key=True)
+    costruction_id = Column(Integer,ForeignKey("constructions.id"),primary_key=True)
+    material_id = Column(Integer,ForeignKey("materials.id"),primary_key=True)
 
     constructions = relationship("Construction", back_populates="materials")
     materials = relationship("Material", back_populates="construction")
@@ -43,10 +43,12 @@ class Construction(Base):
     price= Column(Numeric(10,2),nullable=True)
     init_date = Column(DateTime,nullable=True)
     final_date = Column(DateTime,nullable=True)
-    id_type_construction = Column(Integer,ForeignKey("typeConstruction.id"))
+    id_type_construction = Column(Integer,ForeignKey("typeConstructions.id"))
 
     type_construction = relationship("TypeConstruction",back_populates="constructions")
-    images = relationship("ConstructionImage",back_populates="constructions")
+    # images = relationship("ConstructionImage",back_populates="constructions")
+    images = relationship("ImageConstruction",back_populates="construction",cascade="all, delete",
+        passive_deletes=True,)
     materials = relationship("ConstructionMaterial",back_populates="constructions")
 
 
@@ -57,7 +59,8 @@ class TypeConstruction(Base):
     name= Column(String(250))
     description = Column(Text,nullable=True)
 
-    constructions = relationship("Construction",back_populates="type_construction")
+    constructions = relationship("Construction",back_populates="type_construction",cascade="all, delete",
+        passive_deletes=True,)
 
 class ImageConstruction(Base):
     __tablename__= "images"
@@ -65,8 +68,10 @@ class ImageConstruction(Base):
     id = Column(Integer,primary_key=True,index=True)
     description = Column(Text,nullable=True)
     image = Column(Text,nullable=False)
-
-    construction = relationship("ConstructionImage",back_populates="images")
+    id_construction = Column(Integer,ForeignKey("constructions.id", ondelete='CASCADE'))
+    
+    construction = relationship("Construction",back_populates="images")
+    # construction = relationship("ConstructionImage",back_populates="images")
 
 class Material(Base):
     __tablename__ = "materials"
