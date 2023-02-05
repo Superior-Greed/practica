@@ -9,6 +9,7 @@
 - el test basico de usuario
 
 **tareas a realizar en un futuro lejano**
+- volver asyncrono
 - agregar otro modelo para dar acceso por rol a ciertas rutas mediante un middleware
 - agregar mas validaciones
 - reducir codigo y optimizarlas
